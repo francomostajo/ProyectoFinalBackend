@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Productos</title>
+</head>
+<body>
+{{#if user.firstName}}
+    <p>Bienvenido, {{user.firstName}} {{user.lastName}} ({{user.role}})</p>
+{{else}}
+    <p>Bienvenido, Invitado</p>
+{{/if}}
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/products.js"></script>
+</html>

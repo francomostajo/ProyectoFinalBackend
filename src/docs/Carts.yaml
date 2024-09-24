@@ -1,0 +1,196 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: API de Carritos
+  description: API para gestionar carritos de compra en la plataforma.
+
+paths:
+  /api/carts:
+    get:
+      summary: Obtener todos los carritos
+      description: Retorna una lista de todos los carritos.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de carritos obtenida con éxito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
+              example:
+                - _id: "64cf55d4f1a2b0d6c3e2d9e3"
+                  products:
+                    - productId: "64cf5a2b7b1e4d1234a2d9e4"
+                      quantity: 2
+                  totalAmount: 2400
+                - _id: "64cf55d4f1a2b0d6c3e2d9e4"
+                  products:
+                    - productId: "64cf5a2b7b1e4d1234a2d9e5"
+                      quantity: 1
+                  totalAmount: 1200
+      tags:
+        - Carritos
+
+    post:
+      summary: Crear un nuevo carrito
+      description: Crea un nuevo carrito de compra.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartInput'
+            example:
+              products:
+                - productId: "64cf5a2b7b1e4d1234a2d9e4"
+                  quantity: 3
+      responses:
+        '201':
+          description: Carrito creado con éxito.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+              example:
+                _id: "64cf55d4f1a2b0d6c3e2d9e3"
+                products:
+                  - productId: "64cf5a2b7b1e4d1234a2d9e4"
+                    quantity: 3
+                totalAmount: 3600
+      tags:
+        - Carritos
+
+  /api/carts/{cid}/product/{pid}:
+    post:
+      summary: Agregar un producto al carrito
+      description: Agrega un producto específico al carrito.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+          example: "64cf55d4f1a2b0d6c3e2d9e3"
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+          example: "64cf5a2b7b1e4d1234a2d9e4"
+      responses:
+        '200':
+          description: Producto agregado al carrito con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  cart:
+                    $ref: '#/components/schemas/Cart'
+              example:
+                success: true
+                cart:
+                  _id: "64cf55d4f1a2b0d6c3e2d9e3"
+                  products:
+                    - productId: "64cf5a2b7b1e4d1234a2d9e4"
+                      quantity: 3
+                  totalAmount: 3600
+      tags:
+        - Carritos
+
+  /api/carts/{cid}/purchase:
+    get:
+      summary: Ver los productos en el carrito y finalizar la compra
+      description: Muestra los productos en el carrito y finaliza la compra.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+          example: "64cf55d4f1a2b0d6c3e2d9e3"
+      responses:
+        '200':
+          description: Compra finalizada con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  ticket:
+                    $ref: '#/components/schemas/Ticket'
+              example:
+                success: true
+                message: "Compra realizada con éxito"
+                ticket:
+                  _id: "64d12345678abcde12345678"
+                  code: "ABC123"
+                  purchaser: "user@example.com"
+                  purchaseDate: "2024-08-19T10:00:00Z"
+                  amount: 3600
+      tags:
+        - Carritos
+
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: string
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+              quantity:
+                type: number
+        totalAmount:
+          type: number
+
+    CartInput:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+              quantity:
+                type: number
+
+    Ticket:
+      type: object
+      properties:
+        _id:
+          type: string
+        code:
+          type: string
+        purchaser:
+          type: string
+        purchaseDate:
+          type: string
+        amount:
+          type: number

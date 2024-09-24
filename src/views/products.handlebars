@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Productos</title>
+</head>
+<body>
+    <h1>Lista de Productos</h1>
+
+    {{#if user}}
+        <p>Bienvenido, {{user.first_name}} {{user.last_name}} ({{user.role}})</p>
+        <form action="/logout" method="post">
+            <button type="submit">Logout</button>
+        </form>
+    {{else}}
+        <p>Bienvenido, Invitado</p>
+    {{/if}}
+
+    <form id="filter-form">
+        <select name="sort" id="sort">
+            <option value="asc">Precio: Menor a Mayor</option>
+            <option value="desc">Precio: Mayor a Menor</option>
+        </select>
+        <select name="category" id="category">
+            <option value="">Todas las Categorías</option>
+            <option value="categoria1">Categoría 1</option>
+            <option value="categoria2">Categoría 2</option>
+        </select>
+        <select name="availability" id="availability">
+            <option value="">Todas</option>
+            <option value="available">Disponible</option>
+            <option value="outofstock">Agotado</option>
+        </select>
+        <button type="submit">Filtrar</button>
+    </form>
+
+    <ul id="product-list">
+        {{#each docs}}
+            <li>
+                <h2>{{title}}</h2>
+                <p>{{description}}</p>
+                <p>Precio: ${{price}}</p>
+                <p>Stock: {{stock}}</p>
+                <p>Categoría: {{category}}</p>
+                <p>Estado: {{status}}</p>
+                <input type="number" id="quantity-{{_id}}" min="1" value="1">
+                <button onclick="addToCart('{{_id}}')">Agregar al carrito</button>
+            </li>
+        {{/each}}
+    </ul>
+
+    <div>
+        {{#if isValid}}
+            {{#if hasPrevPage}}
+                <a href="{{prevLink}}">Anterior</a>
+            {{/if}}
+            {{page}}
+            {{#if hasNextPage}}
+                <a href="{{nextLink}}">Siguiente</a>
+            {{/if}}
+        {{/if}}
+    </div>
+
+    {{#if user}}
+        <button onclick="finalizePurchase('{{user.cart}}')">Finalizar la compra</button>
+    {{/if}}
+
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/products.js"></script>
+</html>

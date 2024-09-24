@@ -1,0 +1,176 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: API de Productos
+  description: API para gestionar productos en la plataforma.
+
+paths:
+  /api/products:
+    get:
+      summary: Obtener todos los productos
+      description: Retorna una lista de todos los productos.
+      responses:
+        '200':
+          description: Lista de productos obtenida con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  payload:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+      tags:
+        - Productos
+
+    post:
+      summary: Crear un nuevo producto
+      description: Crear un nuevo producto en la base de datos.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '201':
+          description: Producto creado con éxito.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+      tags:
+        - Productos
+
+  /api/products/{pid}:
+    get:
+      summary: Obtener un producto por ID
+      description: Retorna un producto específico mediante su ID.
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto obtenido con éxito.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+      tags:
+        - Productos
+
+    put:
+      summary: Actualizar un producto por ID
+      description: Actualiza la información de un producto específico.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '200':
+          description: Producto actualizado con éxito.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+      tags:
+        - Productos
+
+    delete:
+      summary: Eliminar un producto por ID
+      description: Elimina un producto específico de la base de datos.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto eliminado con éxito.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+      tags:
+        - Productos
+
+  /api/categories:
+    get:
+      summary: Obtener todas las categorías
+      description: Retorna una lista de todas las categorías de productos.
+      responses:
+        '200':
+          description: Lista de categorías obtenida con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  categories:
+                    type: array
+                    items:
+                      type: string
+      tags:
+        - Categorías
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+        description:
+          type: string
+        stock:
+          type: number
+        imageUrl:
+          type: string
+
+    ProductInput:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+        description:
+          type: string
+        stock:
+          type: number
+        imageUrl:
+          type: string

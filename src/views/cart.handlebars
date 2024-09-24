@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <script src="/js/cart.js" defer></script>
+</head>
+<body>
+    <h1>Carrito de Compras</h1>
+
+    {{#if error}}
+        <p>{{error}}</p>
+    {{else}}
+        <h2>Productos en tu carrito</h2>
+        <ul>
+            {{#each cart.products}}
+                <li>
+                    {{this.productId.title}} - Cantidad: <span class="quantity">{{this.quantity}}</span> - Precio: {{this.productId.price}}
+                    <button class="add-to-cart" data-product-id="{{this.productId._id}}" data-product-price="{{this.productId.price}}">Agregar</button>
+                </li>
+            {{/each}}
+        </ul>
+        <h3>Total: $<span id="total-amount">{{totalAmount}}</span></h3>
+        <input type="hidden" id="cart-id" value="{{cart._id}}">
+        <button id="finalize-purchase">Finalizar Compra</button>
+    {{/if}}
+</body>
+</html>
