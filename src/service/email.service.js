@@ -73,3 +73,20 @@ export const sendPasswordResetEmail = async (user, resetUrl) => {
         console.error('Error al enviar correo de restablecimiento de contraseña:', error);
     }
 };
+
+
+export const sendAccountDeletionEmail = async (email) => {
+    const mailOptions = {
+        from: process.env.EMAIL,
+        to: email,
+        subject: 'Cuenta Eliminada por Inactividad',
+        text: `Tu cuenta ha sido eliminada debido a inactividad. Si crees que esto es un error, por favor contacta con soporte.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Correo de eliminación de cuenta enviado con éxito');
+    } catch (error) {
+        console.error('Error al enviar correo de eliminación:', error);
+    }
+};

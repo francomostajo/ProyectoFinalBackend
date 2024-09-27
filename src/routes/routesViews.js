@@ -1,5 +1,5 @@
 import express from 'express';
-import { isAuthenticated, isNotAuthenticated } from '../middleware/auth.js';
+import { isAdmin, isAuthenticated, isNotAuthenticated } from '../middleware/auth.js';
 import UserModel from '../dao/models/user.model.js';
 import ProductModel from '../dao/models/product.model.js';
 import CartModel from '../dao/models/cart.model.js';
@@ -125,6 +125,10 @@ router.post('/logout', (req, res) => {
         }
         res.redirect('/login');
     });
+});
+
+router.get('/admincontrol', isAuthenticated, isAdmin, (req, res) => {
+    res.render('admincontrol');
 });
 
 export default router;

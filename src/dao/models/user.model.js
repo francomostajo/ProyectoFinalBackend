@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema({
     cart: { type: mongoose.Schema.Types.ObjectId, ref: 'carts' },
     role: { type: String, enum: ['admin', 'user'], default: 'user' },
     resetPasswordToken: { type: String },
-    resetPasswordExpires: { type: Date }
+    resetPasswordExpires: { type: Date } ,
+    lastActive: { type: Date, default: Date.now }, // Añadir este campo
 });
 
 userSchema.pre('save', async function(next) {

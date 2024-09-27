@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import UserModel from '../dao/models/user.model.js';
-import { sendPasswordResetEmail } from './email.service.js';
+import { sendPasswordResetEmail, sendAccountDeletionEmail } from './email.service.js';
 import {
     findUserByEmail,
     createUser
@@ -81,4 +81,35 @@ export const resetPasswordService = async (token, newPassword) => {
     user.resetPasswordExpires = undefined;
 
     await user.save();
+};
+
+export const getAllUsers = async () => {
+    return await UserModel.find({}, 'first_name last_name email role'); // Solo devuelve campos necesarios
+};
+
+export const deleteInactiveUsers = async (req, res, next) => {
+    try {
+        const deletedUsers = await removeInactiveUsers(); // Assuming this function is correctly defined in the service
+        deletedUsers.forEach(user => {
+            sendAccountDeletionEmail(user.email);
+        });
+        res.send({ result: "success", message: 'Usuarios inactivos eliminados.' });
+    } catch (error) {
+        next(createError(500, 'USER_REMOVE_ERROR'));
+    }
+};
+
+
+// Servicio para modificar el rol de un usuario
+export const modifyUser = async (uid, updateData) => {
+    try {
+        const updatedUser = await UserModel.findByIdAndUpdate(uid, updateData, { new: true });
+        if (!updatedUser) {
+            throw new Error('Usuario no encontrado');
+        }
+        return updatedUser;
+    } catch (error) {
+        console.error('Error al modificar el usuario:', error);
+        throw error;
+    }
 };

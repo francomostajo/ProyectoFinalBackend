@@ -2,7 +2,9 @@ import {
     register,
     authenticateUser,
     requestPasswordReset,
-    resetPasswordService
+    resetPasswordService,
+    getAllUsers,
+    modifyUser
 } from '../service/auth.service.js';
 import UserDTO from '../dto/user.dto.js';
 import passport from 'passport';
@@ -19,7 +21,7 @@ export const registerUser = async (req, res, next) => {
 };
 
 export const loginUser = (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
+    passport.authenticate('local', async (err, user, info) => {
         if (err) {
             console.error('Error during login authentication:', err);
             return next(createError(500, 'USER_LOGIN_ERROR'));
@@ -29,16 +31,23 @@ export const loginUser = (req, res, next) => {
             req.flash('error', 'Usuario no registrado. Por favor, regístrese.');
             return res.render('login', { message: req.flash('error') });
         }
-        req.logIn(user, (err) => {
+
+        req.logIn(user, async (err) => {  // Make this callback async
             if (err) {
                 console.error('Error during user login:', err);
                 return next(createError(500, 'USER_LOGIN_ERROR'));
             }
-            return res.redirect('/products');
+            try {
+                user.lastActive = new Date();
+                await user.save();  // Now you can safely use await
+                return res.redirect('/products');
+            } catch (saveError) {
+                console.error('Error saving user:', saveError);
+                return next(createError(500, 'USER_SAVE_ERROR'));
+            }
         });
     })(req, res, next);
 };
-
 export const logoutUser = (req, res, next) => {
     try {
         req.logout();
@@ -113,5 +122,58 @@ export const resetPassword = async (req, res, next) => {
     } catch (error) {
         console.error('Error al restablecer la contraseña:', error.message);
         next(createError(500, 'RESET_PASSWORD_ERROR'));
+    }
+};
+
+export const fetchAllUsers = async (req, res, next) => {
+    try {
+        const users = await getAllUsers();
+        // Solo devolver datos relevantes
+        const userPayload = users.map(user => ({
+            id: user._id,
+            firstName: user.first_name,
+            lastName: user.last_name,
+            email: user.email,
+            role: user.role,
+        }));
+        res.send({ result: "success", payload: userPayload });
+    } catch (error) {
+        next(createError(500, 'USERS_FETCH_ERROR'));
+    }
+};
+
+export const deleteInactiveUsers = async (req, res, next) => {
+    try {
+        const deletedUsers = await removeInactiveUsers();
+        deletedUsers.forEach(user => {
+            sendAccountDeletionEmail(user.email);
+        });
+        res.send({ result: "success", message: 'Usuarios inactivos eliminados.' });
+    } catch (error) {
+        next(createError(500, 'USER_REMOVE_ERROR'));
+    }
+};
+
+export const modifyUserRole = async (req, res, next) => {
+    const { uid } = req.params;
+    const { role } = req.body;
+
+    // Validar si el uid es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(uid)) {
+        return res.status(400).json({ error: 'ID de usuario no válido' });
+    }
+
+    // Validar si el rol es uno permitido
+    const allowedRoles = ['admin', 'user'];
+    if (!allowedRoles.includes(role)) {
+        return res.status(400).json({ error: 'Rol no permitido' });
+    }
+
+    try {
+        const updatedUser = await modifyUser(uid, { role });
+        res.status(200).json({ result: 'success', payload: updatedUser });
+    } catch (error) {
+        console.error('Error al modificar el rol:', error); // Añadir logs para verificar el error
+        next(createError(500, 'USER_MODIFY_ROLE_ERROR'));
     }
 };

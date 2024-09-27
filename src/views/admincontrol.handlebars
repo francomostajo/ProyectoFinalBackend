@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+</head>
+<body>
+    <h1>Panel de Administración</h1>
+    <h2>Usuarios</h2>
+    <button onclick="location.href='/admin/users'">Modificar Usuarios</button>
+    <button onclick="location.href='/admin/products'">Modificar Productos</button>
+
+    <div id="user-list">
+        <!-- Aquí se llenará con JavaScript -->
+    </div>
+    <div id="message"></div> <!-- Para mostrar mensajes de éxito o error -->
+
+   <script>
+async function fetchUsers() {
+    try {
+        const response = await fetch('/api/users'); // Hacemos uso de await aquí
+        if (!response.ok) {
+            throw new Error('Error en la solicitud de usuarios');
+        }
+
+        const data = await response.json();
+        console.log('Usuarios obtenidos:', data);
+
+        const userList = document.getElementById('user-list');
+        userList.innerHTML = ''; // Limpiar la lista antes de agregar los usuarios
+
+        data.payload.forEach(user => {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <p>${user.first_name} ${user.last_name} (${user.role})</p>
+                <select onchange="modifyUserRole('${user._id}', this.value)">
+                    <option value="user">Usuario</option>
+                    <option value="admin">Administrador</option>
+                </select>
+                <button onclick="deleteUser('${user._id}')">Eliminar</button>
+            `;
+            userList.appendChild(div);
+        });
+    } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+    }
+}
+    async function deleteUser(uid) {
+        try {
+            const response = await fetch(`/api/users/${uid}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) throw new Error('Error al eliminar el usuario');
+            showMessage('Usuario eliminado correctamente', 'success');
+            location.reload(); // Recargar para ver cambios
+        } catch (error) {
+            showMessage(error.message, 'error');
+        }
+    }
+
+    function showMessage(message, type) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.innerHTML = message;
+        messageDiv.style.color = type === 'error' ? 'red' : 'green';
+        setTimeout(() => {
+            messageDiv.innerHTML = ''; // Limpiar el mensaje después de 3 segundos
+        }, 3000);
+    }
+    // Cargar la lista de usuarios
+    fetchUsers();
+</script>
+</body>
+</html>
