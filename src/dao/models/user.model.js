@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     age: { type: Number, required: true },
     password: { type: String, required: true },
     cart: { type: mongoose.Schema.Types.ObjectId, ref: 'carts' },
-    role: { type: String, enum: ['admin', 'user'], default: 'user' },
+    role: { type: String, enum: ['admin', 'user', 'premium'], default: 'user' },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date } ,
     lastActive: { type: Date, default: Date.now }, // Añadir este campo

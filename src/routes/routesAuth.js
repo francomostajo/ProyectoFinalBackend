@@ -32,7 +32,7 @@ router.get('/reset-password/:token', renderResetPasswordPage);
 router.post('/reset-password/:token', resetPassword);
 //Admin
 // Obtener todos los usuarios
-router.get('/', isAdmin, fetchAllUsers);
+router.get('/', isAuthenticated, isAdmin, fetchAllUsers);
 
 // Eliminar usuarios inactivos
 /* router.delete('/', isAdmin, deleteInactiveUsers);  */

@@ -16,59 +16,70 @@
     </div>
     <div id="message"></div> <!-- Para mostrar mensajes de éxito o error -->
 
-   <script>
-async function fetchUsers() {
-    try {
-        const response = await fetch('/api/users'); // Hacemos uso de await aquí
-        if (!response.ok) {
-            throw new Error('Error en la solicitud de usuarios');
-        }
-
-        const data = await response.json();
-        console.log('Usuarios obtenidos:', data);
-
-        const userList = document.getElementById('user-list');
-        userList.innerHTML = ''; // Limpiar la lista antes de agregar los usuarios
-
-        data.payload.forEach(user => {
-            const div = document.createElement('div');
-            div.innerHTML = `
-                <p>${user.first_name} ${user.last_name} (${user.role})</p>
-                <select onchange="modifyUserRole('${user._id}', this.value)">
-                    <option value="user">Usuario</option>
-                    <option value="admin">Administrador</option>
-                </select>
-                <button onclick="deleteUser('${user._id}')">Eliminar</button>
-            `;
-            userList.appendChild(div);
-        });
-    } catch (error) {
-        console.error('Error al cargar usuarios:', error);
-    }
-}
-    async function deleteUser(uid) {
+    <script>
+    // Función para obtener la lista de usuarios
+    async function fetchUsers() {
         try {
-            const response = await fetch(`/api/users/${uid}`, {
-                method: 'DELETE'
-            });
-            if (!response.ok) throw new Error('Error al eliminar el usuario');
-            showMessage('Usuario eliminado correctamente', 'success');
-            location.reload(); // Recargar para ver cambios
+            const response = await fetch('/api/users'); // Hacemos la solicitud a la ruta correcta
+            if (!response.ok) {
+                throw new Error(`Error obteniendo usuarios: ${response.status}`);
+            }
+
+            const data = await response.json();
+            renderUsers(data.payload); // Usa `payload` que viene en la respuesta
         } catch (error) {
-            showMessage(error.message, 'error');
+            console.error('Error:', error);
         }
     }
 
-    function showMessage(message, type) {
-        const messageDiv = document.getElementById('message');
-        messageDiv.innerHTML = message;
-        messageDiv.style.color = type === 'error' ? 'red' : 'green';
-        setTimeout(() => {
-            messageDiv.innerHTML = ''; // Limpiar el mensaje después de 3 segundos
-        }, 3000);
+    // Función para renderizar la lista de usuarios en el DOM
+    function renderUsers(users) {
+        const userList = document.getElementById('user-list');
+        userList.innerHTML = ''; // Limpiar cualquier contenido previo
+        users.forEach(user => {
+            const userItem = document.createElement('div');
+            userItem.innerHTML = `
+                <p>${user.first_name || ''} ${user.last_name || ''} (${user.email})</p>
+                <label for="role">Rol:</label>
+                <select id="role-${user._id}" onchange="modifyUserRole('${user._id}', this.value)">
+                    <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+                    <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                    <option value="premium" ${user.role === 'premium' ? 'selected' : ''}>Premium</option>
+                </select>   
+            `;
+            userList.appendChild(userItem);
+        });
     }
-    // Cargar la lista de usuarios
+
+    // Función para modificar el rol de un usuario
+    const modifyUserRole = async (userId, newRole) => {
+        try {
+            if (!userId) {
+                throw new Error('El ID de usuario es undefined');
+            }
+            const response = await fetch(`/api/users/${userId}/role`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ role: newRole }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error modificando el rol');
+            }
+
+            const result = await response.json();
+            document.getElementById('message').innerText = `Rol actualizado correctamente para el usuario con ID ${userId}`;
+            console.log(result);
+        } catch (error) {
+            console.error('Error modificando el rol:', error);
+            document.getElementById('message').innerText = `Error al modificar el rol del usuario con ID ${userId}`;
+        }
+    };
+
+    // Llamada inicial para obtener la lista de usuarios al cargar la página
     fetchUsers();
-</script>
+    </script>
 </body>
-</html>
+</html
