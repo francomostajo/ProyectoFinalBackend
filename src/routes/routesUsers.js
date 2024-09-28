@@ -5,7 +5,8 @@ import {
     fetchUserById,
     updateUser,
     deleteUser,
-    modifyUserRole
+    modifyUserRole,
+    deleteInactiveUsers
 } from '../controllers/user.controller.js';
 import { 
     isAuthenticated,
@@ -20,5 +21,6 @@ router.get('/:id',isAuthenticated, isAdmin, fetchUserById);
 router.put('/:uid',isAuthenticated, isAdmin, updateUser);
 router.delete('/:uid',isAuthenticated, isAdmin, deleteUser);
 router.put('/:uid/role',isAuthenticated, isAdmin, modifyUserRole);
+router.delete('/inactive', deleteInactiveUsers, isAdmin);
 
 export default router;

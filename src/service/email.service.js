@@ -90,3 +90,26 @@ export const sendAccountDeletionEmail = async (email) => {
         console.error('Error al enviar correo de eliminación:', error);
     }
 };
+
+export const sendProductDeletionEmail = async (email, productName) => {
+    const mailOptions = {
+        from: process.env.EMAIL,
+        to: email,
+        subject: 'Producto eliminado de tu cuenta',
+        text: `Estimado usuario,
+
+        Te informamos que tu producto "${productName}" ha sido eliminado por un administrador. 
+
+        Si tienes alguna duda, no dudes en contactarnos.
+
+        Saludos,
+        El equipo de soporte`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Correo de eliminación de producto enviado con éxito');
+    } catch (error) {
+        console.error('Error al enviar correo de eliminación de producto:', error);
+    }
+};

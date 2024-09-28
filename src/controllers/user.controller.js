@@ -50,13 +50,12 @@ export const updateUser = async (req, res, next) => {
 export const deleteUser = async (req, res, next) => {
     try {
         const { uid } = req.params;
-        await removeUser(uid);
+        await removeUser(uid); // La lógica del servicio se encarga de enviar el correo si es necesario
         res.send({ result: "success" });
     } catch (error) {
         next(createError(500, 'USER_REMOVE_ERROR'));
     }
 };
-
 export const modifyUserRole = async (req, res, next) => {
     const { uid } = req.params;
     const { role } = req.body;
@@ -78,5 +77,29 @@ export const modifyUserRole = async (req, res, next) => {
     } catch (error) {
         console.error('Error al modificar el rol:', error);
         next(createError(500, 'USER_MODIFY_ROLE_ERROR'));
+    }
+};
+
+export const deleteInactiveUsers = async (req, res, next) => {
+    try {
+        // Definir la fecha límite (2 días atrás)
+        const now = new Date();
+        const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000); // 2 días atrás
+
+        // Obtener todos los usuarios
+        const users = await getAllUsers();
+
+    
+        const inactiveUsers = users.filter(user => user.lastActive && user.lastActive < twoDaysAgo);
+
+    
+        for (const user of inactiveUsers) {
+            await removeUser(user._id); 
+        }
+
+        res.status(200).json({ message: `${inactiveUsers.length} usuarios inactivos eliminados.` });
+    } catch (error) {
+        console.error('Error eliminando usuarios inactivos:', error);
+        next(createError(500, 'DELETE_INACTIVE_USERS_ERROR'));
     }
 };

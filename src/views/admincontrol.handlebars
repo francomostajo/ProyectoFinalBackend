@@ -44,6 +44,7 @@
                     <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
                     <option value="premium" ${user.role === 'premium' ? 'selected' : ''}>Premium</option>
                 </select>   
+                <button onclick="deleteUser('${user._id}')">Eliminar</button> <!-- Botón de eliminar -->
             `;
             userList.appendChild(userItem);
         });
@@ -76,8 +77,31 @@
         }
     };
 
+    // Función para eliminar un usuario
+    const deleteUser = async (userId) => {
+        try {
+            const confirmation = confirm('¿Estás seguro de que deseas eliminar este usuario?');
+            if (!confirmation) return;
+
+            const response = await fetch(`/api/users/${userId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error eliminando el usuario: ${response.status}`);
+            }
+
+            // Actualizar la lista de usuarios después de la eliminación
+            fetchUsers();
+            document.getElementById('message').innerText = `Usuario eliminado correctamente`;
+        } catch (error) {
+            console.error('Error eliminando usuario:', error);
+            document.getElementById('message').innerText = `Error eliminando el usuario con ID ${userId}`;
+        }
+    };
+
     // Llamada inicial para obtener la lista de usuarios al cargar la página
     fetchUsers();
     </script>
 </body>
-</html
+</html>

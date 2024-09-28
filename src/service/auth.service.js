@@ -40,6 +40,9 @@ export const authenticateUser = async (email, password) => {
     if (!isValidPassword) {
         throw new Error('Contraseña incorrecta');
     }
+       // Actualizar el campo lastActive o lastConnection
+       user.lastActive = Date.now(); // o `lastConnection`
+       await user.save();
     return user;
 };
 
