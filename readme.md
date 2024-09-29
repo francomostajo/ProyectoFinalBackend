@@ -1,7 +1,30 @@
 <h1 align="center"> Entrega Proyecto Final BackEnd </h1>
+---
+
+### Se comparte dos gif donde muestran las consignas de la entrega final 
+
+---
+ 
+ 1.*Vista del administrador para la modificación y eliminación del usuario, este boton al igual que router.delete('/inactive', deleteInactiveUsers, isAdmin); realiza la eliminación y el envio del correo indicando que se elimino la cuenta por inactividad*
+
+
+https://github.com/user-attachments/assets/b8cc1748-5c29-4346-a5ed-45f10c954c4f
+
+
+
+ 2.*Se modifico los endpoints para que el USUARIO PREMIUM o ADMIN, pueda crear el producto y a su vez eliminar dicho producto, cuando se elimina dicho producto se envia un correo informando al usuario que creo el producto que se elimino dicho producto, se realiza a traves de postman *
+ 
+
+
+
+https://github.com/user-attachments/assets/04380137-2710-4e11-a592-8dd566f23671
+
 
 ---
 
+### A continuación detallo la arquitectura del proyecto 
+
+---
 - **`/src`**: Carpeta principal que contiene todo el código del backend.
   - **app.js**: Archivo principal de configuración y puesta en marcha del servidor Express.
   - **config.js**: Configuraciones generales de la aplicación.
@@ -106,25 +129,7 @@
   - **`/layouts`**: Estructura base de las vistas.
     - **main.handlebars**: Layout principal que incluye las vistas parciales.
 
----
 
-### Se comparte dos gif donde muestran las consignas de la entrega final 
-
----
- 
- 1.*Vista del administrador para la modificación y eliminación del usuario, este boton al igual que router.delete('/inactive', deleteInactiveUsers, isAdmin); realiza la eliminación y el envio del correo indicando que se elimino la cuenta por inactividad*
-
-
-https://github.com/user-attachments/assets/b8cc1748-5c29-4346-a5ed-45f10c954c4f
-
-
-
- 2.*Se modifico los endpoints para que el USUARIO PREMIUM o ADMIN, pueda crear el producto y a su vez eliminar dicho producto, cuando se elimina dicho producto se envia un correo informando al usuario que creo el producto que se elimino dicho producto, se realiza a traves de postman *
- 
-
-
-
-https://github.com/user-attachments/assets/04380137-2710-4e11-a592-8dd566f23671
 
 
 
