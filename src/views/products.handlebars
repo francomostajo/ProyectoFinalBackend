@@ -18,22 +18,23 @@
     {{/if}}
 
     <form id="filter-form">
-        <select name="sort" id="sort">
-            <option value="asc">Precio: Menor a Mayor</option>
-            <option value="desc">Precio: Mayor a Menor</option>
-        </select>
-        <select name="category" id="category">
-            <option value="">Todas las Categorías</option>
-            <option value="categoria1">Categoría 1</option>
-            <option value="categoria2">Categoría 2</option>
-        </select>
-        <select name="availability" id="availability">
-            <option value="">Todas</option>
-            <option value="available">Disponible</option>
-            <option value="outofstock">Agotado</option>
-        </select>
-        <button type="submit">Filtrar</button>
-    </form>
+    <select name="sort" id="sort">
+        <option value="asc">Precio: Menor a Mayor</option>
+        <option value="desc">Precio: Mayor a Menor</option>
+    </select>
+    <select name="category" id="category">
+        <option value="">Todas las Categorías</option>
+        <option value="techo">Techo</option>
+        <option value="pared">Pared</option>
+        <option value="mesa">Mesa</option>
+    </select>
+    <select name="availability" id="availability">
+        <option value="">Todas</option>
+        <option value="available">Disponible</option>
+        <option value="outofstock">Agotado</option>
+    </select>
+    <button type="submit">Filtrar</button>
+</form>
 
     <ul id="product-list">
         {{#each docs}}
