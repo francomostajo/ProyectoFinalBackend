@@ -40,7 +40,7 @@ router.get('/products', isAuthenticated, async (req, res) => {
         result.nextLink = result.hasNextPage ? `http://localhost:8080/products?page=${result.nextPage}` : '';
         result.isValid = !(page <= 0 || page > result.totalPages);
         const user = await UserModel.findById(req.user._id).lean();
-        res.render('products', { docs: result.docs, user });
+        res.render('products', { docs: result.docs, user, ...result });
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener los productos' });
     }

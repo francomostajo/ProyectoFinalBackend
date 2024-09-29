@@ -50,17 +50,17 @@
         {{/each}}
     </ul>
 
-    <div>
-        {{#if isValid}}
-            {{#if hasPrevPage}}
-                <a href="{{prevLink}}">Anterior</a>
-            {{/if}}
-            {{page}}
-            {{#if hasNextPage}}
-                <a href="{{nextLink}}">Siguiente</a>
-            {{/if}}
+ <div>
+    {{#if isValid}}
+        {{#if hasPrevPage}}
+            <a href="{{prevLink}}">Anterior</a>
         {{/if}}
-    </div>
+        {{page}} / {{totalPages}}  <!-- Asegúrate de mostrar el total de páginas -->
+        {{#if hasNextPage}}
+            <a href="{{nextLink}}">Siguiente</a>
+        {{/if}}
+    {{/if}}
+</div>
 
     {{#if user}}
         <button onclick="finalizePurchase('{{user.cart}}')">Finalizar la compra</button>
