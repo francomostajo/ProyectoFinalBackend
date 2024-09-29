@@ -8,4 +8,5 @@ router.get('/mockingproducts', (req, res) => {
     res.json(products);
 });
 
+
 export default router;

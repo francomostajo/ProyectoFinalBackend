@@ -14,7 +14,7 @@ import routesUser from './routes/routesUsers.js';
 import routesMessages from './routes/routesMessages.js';
 import routesView from './routes/routesViews.js';
 import routesAuth from './routes/routesAuth.js';
-import mockingRoutes from './routes/routesmocking.js';
+import mockingRoutes from './routes/routesMocking.js';
 import loggerTestRoute from './routes/routesLogger.js';
 import routerTest from './routes/routesTest.js';
 import swaggerJSDoc from 'swagger-jsdoc';
