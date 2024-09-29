@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { getProducts as fetchProducts, getCategories as fetchCategories } from '../service/product.service.js'; // Asegúrate de que esta ruta sea correcta
+import { getProducts as fetchProducts, getCategories as fetchCategories, deleteProduct as removeProduct } from '../service/product.service.js'; // Asegúrate de que esta ruta sea correcta
 import createError from 'http-errors';
 import ProductModel from '../dao/models/product.model.js';
 
@@ -49,7 +49,13 @@ export const getProductById = async (req, res, next) => {
 
 export const createProduct = async (req, res, next) => {
     try {
+        const { user } = req; // El usuario autenticado
         const productData = req.body;
+
+        if (user.role === 'premium') {
+            productData.owner = user._id; // Asignar el propietario solo si es premium
+        }
+
         const newProduct = await ProductModel.create(productData);
         res.status(201).json(newProduct);
     } catch (error) {
@@ -60,11 +66,21 @@ export const createProduct = async (req, res, next) => {
 export const updateProduct = async (req, res, next) => {
     const { pid } = req.params;
     const updatedProductData = req.body;
+    const { user } = req; // Obtener al usuario autenticado
+
     try {
-        const updatedProduct = await ProductModel.findByIdAndUpdate(pid, updatedProductData, { new: true });
-        if (!updatedProduct) {
+        const product = await ProductModel.findById(pid);
+
+        if (!product) {
             return next(createError(404, 'PRODUCT_NOT_FOUND'));
         }
+
+        // Verificar que el usuario sea el dueño o un administrador
+        if (user.role === 'premium' && product.owner.toString() !== user._id.toString()) {
+            return next(createError(403, 'NO_PERMISSION_TO_EDIT_PRODUCT'));
+        }
+
+        const updatedProduct = await ProductModel.findByIdAndUpdate(pid, updatedProductData, { new: true });
         res.json(updatedProduct);
     } catch (error) {
         next(createError(500, 'PRODUCT_UPDATE_ERROR'));
@@ -73,13 +89,26 @@ export const updateProduct = async (req, res, next) => {
 
 export const deleteProduct = async (req, res, next) => {
     const { pid } = req.params;
+    const { user } = req;
+
     try {
-        const deletedProduct = await ProductModel.findByIdAndDelete(pid);
-        if (!deletedProduct) {
+
+        // Verificar que el producto existe
+        const product = await ProductModel.findById(pid).lean();
+        if (!product) {
+            console.error('Producto no encontrado');
             return next(createError(404, 'PRODUCT_NOT_FOUND'));
         }
-        res.json(deletedProduct);
+        // Verificar permisos (usuario premium y propietario o admin)
+        if (user.role === 'premium' && product.owner.toString() !== user._id.toString()) {
+            console.error('No tiene permisos para eliminar el producto');
+            return next(createError(403, 'NO_PERMISSION_TO_DELETE_PRODUCT'));
+        }
+        // Llamada a la función para eliminar el producto
+        const result = await removeProduct(pid, user.email, product.title, user.role);
+        res.json(result); // Respuesta exitosa
     } catch (error) {
+        console.error('Error al eliminar el producto:', error); // Log para rastrear el error
         next(createError(500, 'PRODUCT_DELETION_ERROR'));
     }
 };

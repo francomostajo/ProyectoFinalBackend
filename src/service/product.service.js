@@ -1,5 +1,7 @@
 import { findProducts, findCategories } from '../dao/data/productDao.js';
 import { sendProductDeletionEmail } from './email.service.js'; // Importa la función de mailer
+import ProductModel from '../dao/models/product.model.js'; 
+
 
 export const getProducts = async (query) => {
     const { limit = 10, page = 1, sort, query: searchQuery, categories } = query;
@@ -30,10 +32,23 @@ export const getProducts = async (query) => {
     return products;
 };
 // Enviar notificación cuando un producto es eliminado
-export const deleteProduct = async (productId, userEmail, productName) => {
-    // Lógica para eliminar el producto...
-    await sendProductDeletionEmail(userEmail, productName); // Envía el correo al usuario
-    return { message: `Producto ${productName} eliminado y correo enviado` };
+export const deleteProduct  = async (pid, userEmail, productTitle, userRole) => {
+    try {
+        // Eliminar el producto de la base de datos
+        const deletedProduct = await ProductModel.findByIdAndDelete(pid);
+        if (!deletedProduct) {
+            throw new Error('Error deleting product');
+        }
+
+        // Enviar correo si el usuario es premium
+        if (userRole === 'premium') {
+            await sendProductDeletionEmail(userEmail, productTitle);
+        }
+
+        return { message: 'Producto eliminado correctamente' };
+    } catch (error) {
+        throw new Error('Error deleting product');
+    }
 };
 
 export const getCategories = async () => {

@@ -64,7 +64,8 @@ initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.engine("handlebars", handlebars.engine());
+app.engine('handlebars', handlebars.engine());
+app.set("view engine", "handlebars");
 app.set("view engine", "handlebars");
 app.set("views", __dirname + "/views");
 app.use(express.static(__dirname + "/public"));

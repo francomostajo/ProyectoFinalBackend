@@ -29,3 +29,12 @@ export const isPremium = (req, res, next) => {
         res.status(403).json({ message: 'Acceso denegado: Se requiere rol premium' });
     }
 };
+
+
+export const isAdminOrPremium = (req, res, next) => {
+    if (req.user && (req.user.role === 'admin' || req.user.role === 'premium')) {
+        return next(); // Si es admin o premium, permitir el acceso
+    } else {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+};
